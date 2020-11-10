@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import math
+import re
+
 
 ##ouverture fichier
 def ouvrir_fichier() :
@@ -21,7 +23,7 @@ def ouvrir_fichier() :
     tableau = tableau[1:len(tableau)-1] #on enlève la première ligne (les titres) et la dernière ligne (qui est vide)
 
     for i in range(0, len(tableau)-1) :
-        for j in range(0, 6) :
+        for j in range(0, 7) :
             a = tableau[i][j]
             tableau[i][j] = float(a)
 
@@ -210,8 +212,8 @@ def humidex(date1, date2) :
     #humidex = T + 5/9*(6,112*pow(10, 7,5*T/(237.7+T))*H/100-10)
     l_hum = []
     for i in range(len(periode)) :
-        T = periode[i][2]
-        H = periode[i][3]
+        T = periode[i][titres.index("temp")]
+        H = periode[i][titres.index("humidity")]
         l_hum.append(T + 5/9*(6.112*pow(10, 7.5*T/(237.7+T))*H/100-10))
 
     #moyenne sur la période donnée
@@ -242,7 +244,7 @@ def capteurs() :
     def select_capteur(id) :
         capteur = []
         for ligne in tableau :
-            if ligne[0] == id :
+            if ligne[1] == id :
                 capteur.append(ligne)
         return capteur
 
@@ -255,10 +257,10 @@ def capteurs() :
 
 #tri du tableau par dates croissantes
 def tri() :
-    tab_trie = [tableau[0]]
+    tab_trie = [tableau[1]]
     for ligne in tableau :
         i = 0
-        while i<len(tab_trie) and ligne[6]>=tab_trie[i][6] :
+        while i<len(tab_trie) and ligne[7]>=tab_trie[i][7] :
             i = i+1
         if i>=len(tab_trie) :
             tab_trie.append(ligne)
@@ -270,23 +272,37 @@ def tri() :
 def display_all(nom_var) :
     var = titres.index(nom_var)
     tab_trie = tri()
-    x = []
-    blep = 0
     capts = [[] for i in range(6)] #une liste par capteur
+    xcapts = [[] for i in range(6)] #une liste d'abcisses par capteur
+    kdate = 0 #servira pour les abcisses parce que sinon ça sera pas classé par ordre croissant
+    dates = [] #servira pour la légende des x
+    jours = [] #légende finale avec juste les jours
+
     for ligne in tab_trie :
-        blep = blep+1
-        x.append(blep)
-        id = ligne[0]
-        for i in range(6) : #ajout de la valeur dans la liste du capteur correspondant, et de None dans les autres
+        dates.append(ligne[-1])
+        kdate = kdate+1
+        id = ligne[1]
+        for i in range(6) : #ajout de la valeur dans la liste du capteur correspondant
             if i == id :
                 capts[i].append(ligne[var])
-            else :
-                capts[i].append(None)
+                xcapts[i].append(kdate)
+
+
+    #remplissage de la liste "jours" pour la légende
+    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    mem = jours[0]
+    for i in range(1,len(dates)) :
+        if not re.match(mem,dates[i]) :
+            jours.append(dates[i][:10])
+            mem = dates[i][:10]
+        else :
+            jours.append("")
 
     #affichage sous forme de graphique
     plt.close()
     for i in range(6) :
-        plt.scatter(x, capts[i], s=2, label=str("capteur "+str(i+1)))
+        plt.plot(np.array(xcapts[i]), np.array(capts[i]),label="capteur "+str(i+1))
+    plt.xticks(range(len(jours)), jours, rotation=45)
     plt.title(nom_var)
     plt.legend()
     plt.show()

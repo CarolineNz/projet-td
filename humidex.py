@@ -7,8 +7,8 @@ def humidex(date1, date2) :
     #humidex = T + 5/9*(6,112*pow(10, 7,5*T/(237.7+T))*H/100-10)
     l_hum = []
     for i in range(len(periode)) :
-        T = periode[i][2]
-        H = periode[i][3]
+        T = periode[i][titres.index("temp")]
+        H = periode[i][titres.index("humidity")]
         l_hum.append(T + 5/9*(6.112*pow(10, 7.5*T/(237.7+T))*H/100-10))
 
     #moyenne sur la période donnée

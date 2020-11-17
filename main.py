@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 import re
-import pandas as pd
 
 
 ##ouverture fichier
@@ -23,7 +22,7 @@ def ouvrir_fichier() :
     titres = tableau[0]
     tableau = tableau[1:len(tableau)-1] #on enlève la première ligne (les titres) et la dernière ligne (qui est vide)
 
-    for i in range(0, len(tableau)-1) :
+    for i in range(0, len(tableau)) :
         for j in range(0, 7) :
             a = tableau[i][j]
             tableau[i][j] = float(a)
@@ -35,15 +34,18 @@ def ouvrir_fichier() :
 ##sélection d'une durée entre deux dates
 def select_lignes(date1, date2) :
     '''Crée un nouveau tableau "periode" avec les lignes du tableau de base comprises entre les deux dates incluses '''
-    periode = []
-    for ligne in tableau :
-        if ligne[-1]>=date1 and ligne[-1]<=date2 :
-            periode.append(ligne)
-    return periode
+    if date1=="2019-08-11 11:30:50+02:00" and date2=="2019-08-25 17:47:08+02:00" :
+        return tableau
+    else :
+        periode = []
+        for ligne in tableau :
+            if ligne[-1]>=date1 and ligne[-1]<=date2 :
+                periode.append(ligne)
+        return periode
 
 
 ##affichage de la courbe d'une variable
-def display(nom_var, date1, date2) :
+def display(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables'''
     var = titres.index(nom_var)
@@ -65,7 +67,7 @@ def display(nom_var, date1, date2) :
 
 ##stats
 
-def moyenne(nom_var, date1, date2) :
+def moyenne(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(date1, date2)
     l_var = [ligne[var] for ligne in periode]
@@ -75,7 +77,7 @@ def moyenne(nom_var, date1, date2) :
     moy = moy/len(l_var)
     return moy
 
-def variance(nom_var, date1, date2) :
+def variance(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(date1, date2)
     l_var = [ligne[var] for ligne in periode]
@@ -86,10 +88,10 @@ def variance(nom_var, date1, date2) :
     vari = vari/len(l_var)
     return vari
 
-def ecart_type(nom_var, date1, date2) :
+def ecart_type(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     return math.sqrt(variance(nom_var, date1, date2))
 
-def mediane(nom_var, date1, date2) :
+def mediane(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(date1, date2)
     print(var)
@@ -97,13 +99,13 @@ def mediane(nom_var, date1, date2) :
     i = len(l_var)//2
     return l_var[i]
 
-def minimum(nom_var, date1, date2) :
+def minimum(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(date1, date2)
     l_var = [ligne[var] for ligne in periode]
     return (min(l_var))
 
-def maximum(nom_var, date1, date2) :
+def maximum(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(date1, date2)
     l_var = [ligne[var] for ligne in periode]
@@ -111,7 +113,7 @@ def maximum(nom_var, date1, date2) :
 
 
 ##affichage des statistiques d'une variable
-def displayStat(nom_var, date1, date2) :
+def displayStat(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables avec ses statistiques'''
     var = titres.index(nom_var)
@@ -153,7 +155,7 @@ def displayStat(nom_var, date1, date2) :
 
 
 ##indice de corrélation
-def correlation(nom_var1, nom_var2, date1, date2) :
+def correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
     utilise tableau, select_lignes, moyenne et ecart_type
     affiche les courbes des variables et l'indice de corrélation, renvoie l'indice de corrélation'''
@@ -204,7 +206,7 @@ def correlation(nom_var1, nom_var2, date1, date2) :
 
 ##indice humidex
 
-def humidex(date1, date2) :
+def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''utilise tableau, select_lignes
     affiche la courbe de l'humidex sur la période donnée
     renvoie l'humidex moyen'''
@@ -309,8 +311,3 @@ def display_all(nom_var) :
     plt.show()
 
     return
-
-## INTERFACE
-
-
-

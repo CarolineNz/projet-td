@@ -1,4 +1,4 @@
-def displayStat(nom_var, date1, date2) :
+def displayStat(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables avec ses statistiques'''
     var = titres.index(nom_var)

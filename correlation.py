@@ -1,4 +1,4 @@
-def correlation(nom_var1, nom_var2, date1, date2) :
+def correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
     utilise tableau, select_lignes, moyenne et ecart_type
     affiche les courbes des variables et l'indice de corrélation, renvoie l'indice de corrélation'''

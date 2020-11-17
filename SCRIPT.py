@@ -334,7 +334,6 @@ elif action == "displayStat" :
     else :
         displayStat(sys.argv[2])
 elif action == "corrélation" :
-    #sys.argv = [script, displayStat, variable 1, variable 2, date1, date2]
     if len(sys.argv) == 6 : #les dates sont précisées
         correlation(sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     else :

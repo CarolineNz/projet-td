@@ -1,4 +1,4 @@
-def humidex(date1, date2) :
+def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''utilise tableau, select_lignes
     affiche la courbe de l'humidex sur la période donnée
     renvoie l'humidex moyen'''

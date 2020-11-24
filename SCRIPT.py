@@ -355,6 +355,7 @@ def analyse_positions() :
     plt.text(xmax-10,2, "Près de la rue")
     plt.text(0,ymin, "Nord")
     plt.text(0,ymax, "Sud")
+    plt.title("Analyse en fonction du co2 et de la luminosité")
 
     plt.show()
 

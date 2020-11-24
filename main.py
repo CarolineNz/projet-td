@@ -260,7 +260,6 @@ def capteurs() :
         l_capteurs.append(select_capteur(id))
     return l_capteurs
 
-#AFFICHAGE DES COURBES
 
 #tri du tableau par dates croissantes
 def tri() :

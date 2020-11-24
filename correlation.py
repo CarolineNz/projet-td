@@ -39,9 +39,13 @@ def correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="20
     y2 = np.array(l_var2)
     x = np.array([i for i in range(len(l_var1))]) #car les mesures sont prises à intervalles réguliers
 
-    plt.plot(x, y1, label=nom_var1)
-    plt.plot(x, y2, label=nom_var2)
-    plt.legend()
+    #affichages avec deux ordonnées à échelles différentes :
+    c1 = plt.plot(x, y1, color="blue")
+    plt.legend(c1,[nom_var1], loc = 'upper left')
+    ax2 = plt.gca().twinx()
+
+    c2=ax2.plot(x, y2, color="orange")
+    plt.legend(c2,[nom_var2])
     plt.title("Coefficient de corrélation : "+str(r))
     plt.show()
 

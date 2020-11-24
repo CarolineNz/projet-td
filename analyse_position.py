@@ -1,21 +1,13 @@
 def analyse_positions() :
-    l_capteurs = capteurs()
     #calcul des moyennes de chaque valeur :
     moy_co2 = moyenne("co2")
     moy_lum = moyenne("lum")
     ecarts_co2 = []
     ecarts_lum = []
-    for capt in l_capteurs :
+    for id in range(1,7) :
         #calcul des moyennes pour le capteur :
-        moy_capt_co2=0
-        moy_capt_lum=0
-        i_co2 = titres.index("co2")
-        i_lum = titres.index("lum")
-        for ligne in capt :
-            moy_capt_co2 = moy_capt_co2+ligne[i_co2]
-            moy_capt_lum = moy_capt_lum+ligne[i_lum]
-        moy_capt_co2 = moy_capt_co2/len(capt)
-        moy_capt_lum = moy_capt_lum/len(capt)
+        moy_capt_co2 = moyenne_bis("co2",id)
+        moy_capt_lum = moyenne_bis("lum",id)
         #calcul des écarts aux moyennes pour ce capteur :
         ecarts_co2.append(moy_co2-moy_capt_co2)
         ecarts_lum.append(moy_lum-moy_capt_lum)
@@ -40,8 +32,8 @@ def analyse_positions() :
     plt.text(xmax-10,2, "Près de la rue")
     plt.text(0,ymin, "Nord")
     plt.text(0,ymax, "Sud")
-
     plt.title("Analyse en fonction du co2 et de la luminosité")
+
     plt.show()
 
 

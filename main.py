@@ -196,9 +196,13 @@ def correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="20
     y2 = np.array(l_var2)
     x = np.array([i for i in range(len(l_var1))]) #car les mesures sont prises à intervalles réguliers
 
-    plt.plot(x, y1, label=nom_var1)
-    plt.plot(x, y2, label=nom_var2)
-    plt.legend()
+    #affichages avec deux ordonnées à échelles différentes :
+    c1 = plt.plot(x, y1, color="blue")
+    plt.legend(c1,[nom_var1], loc = 'upper left')
+    ax2 = plt.gca().twinx()
+
+    c2=ax2.plot(x, y2, color="orange")
+    plt.legend(c2,[nom_var2])
     plt.title("Coefficient de corrélation : "+str(r))
     plt.show()
 
@@ -242,15 +246,15 @@ def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"
 ##COMPARAISON DES CAPTEURS
 
 ##séparation des capteurs
+
+def select_capteur(id) :
+    capteur = []
+    for ligne in tableau :
+        if ligne[1] == id :
+            capteur.append(ligne)
+    return capteur
+
 def capteurs() :
-
-    def select_capteur(id) :
-        capteur = []
-        for ligne in tableau :
-            if ligne[1] == id :
-                capteur.append(ligne)
-        return capteur
-
     l_capteurs = []
     for id in range(1, 7) :
         l_capteurs.append(select_capteur(id))
@@ -309,5 +313,54 @@ def display_all(nom_var) :
     plt.title(nom_var)
     plt.legend()
     plt.show()
+
+    return
+
+##Position des capteurs
+def analyse_positions() :
+    l_capteurs = capteurs()
+    #calcul des moyennes de chaque valeur :
+    moy_co2 = moyenne("co2")
+    moy_lum = moyenne("lum")
+    ecarts_co2 = []
+    ecarts_lum = []
+    for capt in l_capteurs :
+        #calcul des moyennes pour le capteur :
+        moy_capt_co2=0
+        moy_capt_lum=0
+        i_co2 = titres.index("co2")
+        i_lum = titres.index("lum")
+        for ligne in capt :
+            moy_capt_co2 = moy_capt_co2+ligne[i_co2]
+            moy_capt_lum = moy_capt_lum+ligne[i_lum]
+        moy_capt_co2 = moy_capt_co2/len(capt)
+        moy_capt_lum = moy_capt_lum/len(capt)
+        #calcul des écarts aux moyennes pour ce capteur :
+        ecarts_co2.append(moy_co2-moy_capt_co2)
+        ecarts_lum.append(moy_lum-moy_capt_lum)
+
+    #affichage :
+    plt.clf()
+    for i in range(6) :
+        #un point de couleur par capteur
+        plt.scatter(ecarts_co2[i], ecarts_lum[i], label="capteur"+str(i+1))
+    plt.legend()
+    axes = plt.gca()
+
+    #affichages d'axes x=0 et y=0
+    axes = plt.gca()
+    xmin, xmax = axes.get_xlim()
+    plt.plot([xmin, xmax],[0, 0], color="k")
+    ymin, ymax = axes.get_ylim()
+    plt.plot([0, 0], [ymin, ymax], color="k")
+
+    #affichage du texte
+    plt.text(xmin,2, "Loin de la rue")
+    plt.text(xmax-10,2, "Près de la rue")
+    plt.text(0,ymin, "Nord")
+    plt.text(0,ymax, "Sud")
+
+    plt.show()
+
 
     return

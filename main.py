@@ -316,24 +316,49 @@ def display_all(nom_var) :
     return
 
 ##Position des capteurs
+
+#moyenne d'une variable pour un capteur donné
+def moyenne_bis(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    var = titres.index(nom_var)
+    periode = select_capteur(id)
+    l_var = [ligne[var] for ligne in periode]
+    moy = 0
+    for e in l_var :
+        moy = moy+e
+    moy = moy/len(l_var)
+    return moy
+
+#comparaison : au dessus/en dessous de la moyenne pour chaque capteur
+def analyse_moy(nom_var):
+    sup=[]
+    inf=[]
+    for i in range(1,6):
+        if moyenne_bis(nom_var,i)>=moyenne(nom_var):
+            sup.append(i)
+        else :
+            inf.append(i)
+    print("Supérieur à la moyenne :",sup)
+    print("Inférieur à la moyenne :",inf)
+    return
+
+def analyse_moy_all():
+    for i in titres[2:-1]:
+        print(i)
+        analyse_moy(i)
+        print("\n")
+
+    return
+
 def analyse_positions() :
-    l_capteurs = capteurs()
     #calcul des moyennes de chaque valeur :
     moy_co2 = moyenne("co2")
     moy_lum = moyenne("lum")
     ecarts_co2 = []
     ecarts_lum = []
-    for capt in l_capteurs :
+    for id in range(1,7) :
         #calcul des moyennes pour le capteur :
-        moy_capt_co2=0
-        moy_capt_lum=0
-        i_co2 = titres.index("co2")
-        i_lum = titres.index("lum")
-        for ligne in capt :
-            moy_capt_co2 = moy_capt_co2+ligne[i_co2]
-            moy_capt_lum = moy_capt_lum+ligne[i_lum]
-        moy_capt_co2 = moy_capt_co2/len(capt)
-        moy_capt_lum = moy_capt_lum/len(capt)
+        moy_capt_co2 = moyenne_bis("co2",id)
+        moy_capt_lum = moyenne_bis("lum",id)
         #calcul des écarts aux moyennes pour ce capteur :
         ecarts_co2.append(moy_co2-moy_capt_co2)
         ecarts_lum.append(moy_lum-moy_capt_lum)
@@ -358,7 +383,7 @@ def analyse_positions() :
     plt.text(xmax-10,2, "Près de la rue")
     plt.text(0,ymin, "Nord")
     plt.text(0,ymax, "Sud")
-    plt.titre("Analyse en fonction du co2 et de la luminosité")
+    plt.title("Analyse en fonction du co2 et de la luminosité")
 
     plt.show()
 

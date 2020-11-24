@@ -198,9 +198,13 @@ def correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="20
     y2 = np.array(l_var2)
     x = np.array([i for i in range(len(l_var1))]) #car les mesures sont prises à intervalles réguliers
 
-    plt.plot(x, y1, label=nom_var1)
-    plt.plot(x, y2, label=nom_var2)
-    plt.legend()
+    #affichages avec deux ordonnées à échelles différentes :
+    c1 = plt.plot(x, y1, color="blue")
+    plt.legend(c1,[nom_var1], loc = 'upper left')
+    ax2 = plt.gca().twinx()
+
+    c2=ax2.plot(x, y2, color="orange")
+    plt.legend(c2,[nom_var2])
     plt.title("Coefficient de corrélation : "+str(r))
     plt.show()
 
@@ -258,6 +262,7 @@ def capteurs() :
         l_capteurs.append(select_capteur(id))
     return l_capteurs
 
+
 #tri du tableau par dates croissantes
 def tri() :
     tab_trie = [tableau[1]]
@@ -313,24 +318,49 @@ def display_all(nom_var) :
     return
 
 ##Position des capteurs
+
+#moyenne d'une variable pour un capteur donné
+def moyenne_bis(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    var = titres.index(nom_var)
+    periode = select_capteur(id)
+    l_var = [ligne[var] for ligne in periode]
+    moy = 0
+    for e in l_var :
+        moy = moy+e
+    moy = moy/len(l_var)
+    return moy
+
+#comparaison : au dessus/en dessous de la moyenne pour chaque capteur
+def analyse_moy(nom_var):
+    sup=[]
+    inf=[]
+    for i in range(1,6):
+        if moyenne_bis(nom_var,i)>=moyenne(nom_var):
+            sup.append(i)
+        else :
+            inf.append(i)
+    print("Supérieur à la moyenne :",sup)
+    print("Inférieur à la moyenne :",inf)
+    return
+
+def analyse_moy_all():
+    for i in titres[2:-1]:
+        print(i)
+        analyse_moy(i)
+        print("\n")
+
+    return
+
 def analyse_positions() :
-    l_capteurs = capteurs()
     #calcul des moyennes de chaque valeur :
     moy_co2 = moyenne("co2")
     moy_lum = moyenne("lum")
     ecarts_co2 = []
     ecarts_lum = []
-    for capt in l_capteurs :
+    for id in range(1,7) :
         #calcul des moyennes pour le capteur :
-        moy_capt_co2=0
-        moy_capt_lum=0
-        i_co2 = titres.index("co2")
-        i_lum = titres.index("lum")
-        for ligne in capt :
-            moy_capt_co2 = moy_capt_co2+ligne[i_co2]
-            moy_capt_lum = moy_capt_lum+ligne[i_lum]
-        moy_capt_co2 = moy_capt_co2/len(capt)
-        moy_capt_lum = moy_capt_lum/len(capt)
+        moy_capt_co2 = moyenne_bis("co2",id)
+        moy_capt_lum = moyenne_bis("lum",id)
         #calcul des écarts aux moyennes pour ce capteur :
         ecarts_co2.append(moy_co2-moy_capt_co2)
         ecarts_lum.append(moy_lum-moy_capt_lum)
@@ -388,6 +418,9 @@ elif action == "corrélation" :
         correlation(sys.argv[2], sys.argv[3])
 elif action == "displayAll" :
     display_all(sys.argv[2])
+elif action == "analyse_moyenne_all" :
+    analyse_moy_all()
+
 elif action == "analyse_position" :
     analyse_positions()
 else :

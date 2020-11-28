@@ -9,7 +9,7 @@ def ouvrir_fichier() :
     '''Ouvre le fichier de données et le convertit en variables exploitables
     renvoie : (titres[liste de chaines], tableau[liste de listes de données]) '''
 
-    file = open("D:\Documents\GitHub\projet-td\EIVP_KM.csv") #à changer
+    file = open("D:\EIVP_KM.csv") #à changer
     content = file.read()
     file.close()
 
@@ -42,28 +42,6 @@ def select_lignes(date1, date2) :
             if ligne[-1]>=date1 and ligne[-1]<=date2 :
                 periode.append(ligne)
         return periode
-
-
-##affichage de la courbe d'une variable
-def display(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
-    '''Utilise tableau, select_lignes
-    affiche la courbe d'une des variables'''
-    var = titres.index(nom_var)
-    #RECUPERATION DE LA VARIABLE UTILE
-    periode = select_lignes(date1, date2)
-    l_var = [ligne[var] for ligne in period]
-
-
-    #AFFICHAGE DE LA COURBE
-    plt.close()
-    y = np.array(l_var)
-    x = np.array([i for i in range(len(l_var))])
-
-    plt.plot(x, y, label=titres[var])
-    plt.legend()
-
-    plt.show()
-
 
 ##stats
 
@@ -112,6 +90,27 @@ def maximum(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:
     return (min(l_var))
 
 
+
+##affichage de la courbe d'une variable
+def display(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    '''Utilise tableau, select_lignes
+    affiche la courbe d'une des variables'''
+    var = titres.index(nom_var)
+    #RECUPERATION DE LA VARIABLE UTILE
+    periode = select_lignes(date1, date2)
+    l_var = [ligne[var] for ligne in period]
+
+
+    #AFFICHAGE DE LA COURBE
+    plt.close()
+    y = np.array(l_var)
+    x = np.array([i for i in range(len(l_var))])
+
+    plt.plot(x, y, label=titres[var])
+    plt.legend()
+
+    plt.show()
+    
 ##affichage des statistiques d'une variable
 def displayStat(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
@@ -241,6 +240,7 @@ def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"
     plt.show()
 
     return hum_moy
+
 
 
 ##COMPARAISON DES CAPTEURS

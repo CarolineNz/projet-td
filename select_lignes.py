@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Sat Nov 28 20:59:55 2020
-
-@author: Sophie
-"""
 
 ##sélection d'une durée entre deux dates pour un capteur donné
 def select_lignes(id, date1, date2) :

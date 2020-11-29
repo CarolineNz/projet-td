@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Nov 24 15:44:30 2020
-
-@author: Sophie
-"""
-
 def coef_correlation(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
     utilise tableau, select_lignes, moyenne et ecart_type

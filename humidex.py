@@ -1,8 +1,8 @@
-def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''utilise tableau, select_lignes
     affiche la courbe de l'humidex sur la période donnée
     renvoie l'humidex moyen'''
-    periode = select_lignes(date1,date2)
+    periode = select_lignes(id, date1,date2)
 
     #humidex = T + 5/9*(6,112*pow(10, 7,5*T/(237.7+T))*H/100-10)
     l_hum = []
@@ -12,10 +12,26 @@ def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"
         l_hum.append(T + 5/9*(6.112*pow(10, 7.5*T/(237.7+T))*H/100-10))
 
     #moyenne sur la période donnée
+    
     hum_moy = 0
     for h in l_hum :
         hum_moy = hum_moy+h
     hum_moy = hum_moy/len(l_hum)
+    
+    #Permet de mettre des dates comme abscisse
+    #long à executer mais plus élégant
+    dates = [] 
+    jours = [] 
+    for ligne in periode :
+        dates.append(ligne[-1])
+    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    mem = jours[0]
+    for i in range(1,len(dates)) :
+        if not re.match(mem,dates[i]) :
+            jours.append(dates[i][:10])
+            mem = dates[i][:10]
+        else :
+            jours.append("")
 
     #affichage sous forme de graphique
     plt.close()
@@ -25,6 +41,7 @@ def humidex(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"
     plt.plot(x, y1, label="humidex")
     plt.plot(x, y2, label="humidex moyen")
     plt.title("Humidex moyen : "+str(hum_moy))
+    plt.xticks(range(len(jours)), jours, rotation=45)
     plt.legend()
     plt.show()
 

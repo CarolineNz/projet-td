@@ -43,6 +43,26 @@ def select_capteur(id) :
     return capteur
 
 
+##séparation des capteurs
+def capteurs() :
+    l_capteurs = []
+    for id in range(1, 7) :
+        l_capteurs.append(select_capteur(id))
+    return l_capteurs
+
+
+#tri du tableau par dates croissantes
+def tri() :
+    tab_trie = [tableau[1]]
+    for ligne in tableau :
+        i = 0
+        while i<len(tab_trie) and ligne[7]>=tab_trie[i][7] :
+            i = i+1
+        if i>=len(tab_trie) :
+            tab_trie.append(ligne)
+        else :
+            tab_trie.insert(i, ligne)
+    return tab_trie
 
 ##sélection d'une durée entre deux dates pour un capteur donné
 def select_lignes(id, date1, date2) :
@@ -206,6 +226,28 @@ def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     
     
     
+def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    '''Utilise tableau, select_lignes
+    affiche la courbe d'une des variables'''
+    var = titres.index(nom_var)
+    
+    #RECUPERATION DE LA VARIABLE UTILE
+    periode = select_lignes_all(date1, date2)
+    l_var = [ligne[var] for ligne in periode]
+
+    #AFFICHAGE DE LA COURBE
+    plt.close()
+    y = np.array(l_var)
+    x = np.array([i for i in range(len(l_var))])
+
+    plt.plot(x, y, label=titres[var])
+    plt.ylabel(nom_var)
+    plt.legend()
+
+    plt.show()
+    
+
+    
 ##affichage des statistiques d'une variable
 def displayStat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
@@ -273,7 +315,7 @@ def displayStat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-2
 
 
 #affichage de toutes les courbes
-def display_all(nom_var) :
+def display_capts(nom_var) :
     var = titres.index(nom_var)
     tab_trie = tri()
     capts = [[] for i in range(6)] #une liste par capteur
@@ -296,6 +338,7 @@ def display_all(nom_var) :
     mem = jours[0]
     for i in range(1,len(dates)) :
         if not re.match(mem,dates[i]) :
+            
             jours.append(dates[i][:10])
             mem = dates[i][:10]
         else :
@@ -364,100 +407,15 @@ def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02
 
     return hum_moy
 
-
-##pour l'ensemble des cpateurs
-def humidex_all(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
-    '''utilise tableau, select_lignes
-    affiche la courbe de l'humidex sur la période donnée
-    renvoie l'humidex moyen'''
-    periode = select_lignes_all(date1,date2)
-
-    #humidex = T + 5/9*(6,112*pow(10, 7,5*T/(237.7+T))*H/100-10)
-    l_hum = []
-    for i in range(len(periode)) :
-        T = periode[i][titres.index("temp")]
-        H = periode[i][titres.index("humidity")]
-        l_hum.append(T + 5/9*(6.112*pow(10, 7.5*T/(237.7+T))*H/100-10))
-
-    #moyenne sur la période donnée
-    
-    hum_moy = 0
-    for h in l_hum :
-        hum_moy = hum_moy+h
-    hum_moy = hum_moy/len(l_hum)
-
-    #affichage sous forme de graphique
-    plt.close()
-    x = np.array([i for i in range(len(l_hum))]) #car les mesures sont prises à intervalles réguliers
-    y1 = np.array(l_hum)
-    y2 = np.array([hum_moy for i in range (len(l_hum))])
-    plt.plot(x, y1, label="humidex")
-    plt.plot(x, y2, label="humidex moyen")
-    plt.title("Humidex moyen : "+str(hum_moy))
-    plt.legend()
-    plt.show()
-
-    return hum_moy
-
-def humidex_all_bis():
+def humidex_all():
     resultat=0
     for i in range(1,7):
         resultat+=humidex(i)
     return resultat/6
 
+
+
 ##INDICE DE CORRELATION
-def correlation_all(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
-    '''var1 et var2 les INDICES des variables (numéro de colonne)
-    utilise tableau, select_lignes, moyenne et ecart_type
-    affiche les courbes des variables et l'indice de corrélation, renvoie l'indice de corrélation'''
-    var1 = titres.index(nom_var1)
-    var2 = titres.index(nom_var2)
-    periode = select_lignes_all(date1, date2)
-
-    #CALCUL DU COEFFICIENT
-    #calcul de l'espérence du produit
-    l_var1 = [ligne[var1] for ligne in periode]
-    l_var2 = [ligne[var2] for ligne in periode]
-    l_prod = []
-    for i in range(len(periode)) :
-        l_prod.append(l_var1[i]*l_var2[i])
-    moyp = 0
-    for i in range(len(periode)) :
-        moyp = moyp+l_prod[i]
-    moyp = moyp/len(periode)
-
-    #calcul des deux autres espérences
-    moy1 = moyenne_all(nom_var1, date1, date2)
-    moy2 = moyenne_all(nom_var2, date1, date2)
-
-    #calcul de la covariance
-    cov = moyp - moy1*moy2
-
-    #calcul des écart-types
-    sigma1 = ecart_type_all(nom_var1, date1, date2)
-    sigma2 = ecart_type_all(nom_var2, date1, date2)
-
-    #calcul du coefficient de correlation
-    r = cov/(sigma1*sigma2)
-
-
-    #AFFICHAGE DES DEUX COURBES
-    plt.close()
-    y1 = np.array(l_var1)
-    y2 = np.array(l_var2)
-    x = np.array([i for i in range(len(l_var1))]) #car les mesures sont prises à intervalles réguliers
-
-    #affichages avec deux ordonnées à échelles différentes :
-    c1 = plt.plot(x, y1, color="blue")
-    plt.legend(c1,[nom_var1], loc = 'upper left')
-    ax2 = plt.gca().twinx()
-
-    c2=ax2.plot(x, y2, color="orange")
-    plt.legend(c2,[nom_var2])
-    plt.title("Coefficient de corrélation : "+str(r))
-    plt.show()
-
-    return r
 
 def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
@@ -517,46 +475,60 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
     #affichages avec deux ordonnées à échelles différentes :
     c1 = plt.plot(x, y1, color="blue")
     plt.legend(c1,[nom_var1], loc = 'upper left')
-    ax2 = plt.gca().twinx()
-
-    c2=ax2.plot(x, y2, color="orange") 
     plt.xticks(range(len(jours)), jours, rotation=45)
-    plt.legend(c2,[nom_var2])
+    ax2 = plt.gca().twinx()
+    
+    
+    
+    c2=ax2.plot(x, y2, color="orange") 
+    plt.legend(c2,[nom_var2],loc='upper right')
+    #ax2.xticks(range(len(jours)), jours, rotation=45)
     plt.title("Coefficient de corrélation : "+str(r))
+    
     plt.show()
 
     return r
 
+## Je sais pas si c'est utile ?
+def correlation_all(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    '''var1 et var2 les INDICES des variables (numéro de colonne)
+    utilise tableau, select_lignes, moyenne et ecart_type
+    renvoie l'indice de corrélation'''
+    var1 = titres.index(nom_var1)
+    var2 = titres.index(nom_var2)
+    periode = select_lignes_all(date1, date2)
 
+    #CALCUL DU COEFFICIENT
+    #calcul de l'espérence du produit
+    l_var1 = [ligne[var1] for ligne in periode]
+    l_var2 = [ligne[var2] for ligne in periode]
+    l_prod = []
+    for i in range(len(periode)) :
+        l_prod.append(l_var1[i]*l_var2[i])
+    moyp = 0
+    for i in range(len(periode)) :
+        moyp = moyp+l_prod[i]
+    moyp = moyp/len(periode)
 
-##COMPARAISON DES CAPTEURS
+    #calcul des deux autres espérences
+    moy1 = moyenne_all(nom_var1, date1, date2)
+    moy2 = moyenne_all(nom_var2, date1, date2)
 
-##séparation des capteurs
+    #calcul de la covariance
+    cov = moyp - moy1*moy2
 
-def capteurs() :
-    l_capteurs = []
-    for id in range(1, 7) :
-        l_capteurs.append(select_capteur(id))
-    return l_capteurs
+    #calcul des écart-types
+    sigma1 = ecart_type_all(nom_var1, date1, date2)
+    sigma2 = ecart_type_all(nom_var2, date1, date2)
 
+    #calcul du coefficient de correlation
+    r = cov/(sigma1*sigma2)
+    return r
 
-#tri du tableau par dates croissantes
-def tri() :
-    tab_trie = [tableau[1]]
-    for ligne in tableau :
-        i = 0
-        while i<len(tab_trie) and ligne[7]>=tab_trie[i][7] :
-            i = i+1
-        if i>=len(tab_trie) :
-            tab_trie.append(ligne)
-        else :
-            tab_trie.insert(i, ligne)
-    return tab_trie
 
 
 
 ##Position des capteurs
-
 #comparaison : au dessus/en dessous de la moyenne pour chaque capteur
 def analyse_moy(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"):
     sup=[]

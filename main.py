@@ -9,7 +9,7 @@ def ouvrir_fichier() :
     '''Ouvre le fichier de données et le convertit en variables exploitables
     renvoie : (titres[liste de chaines], tableau[liste de listes de données]) '''
 
-    file = open("D:\EIVP_KM.csv") #à changer
+    file = open("D:\Documents\GitHub\projet-td\EIVP_KM.csv") #à changer
     content = file.read()
     file.close()
 
@@ -31,30 +31,10 @@ def ouvrir_fichier() :
 
 (titres, tableau) = ouvrir_fichier()
 
-
-
-##SELECTION DE DONNES
-##selection du tableau associé à un capteur donné
-def select_capteur(id) :
-    capteur = []
-    for ligne in tableau :
-        if ligne[1] == id :
-            capteur.append(ligne)
-    return capteur
-
-
-##séparation des capteurs
-def capteurs() :
-    l_capteurs = []
-    for id in range(1, 7) :
-        l_capteurs.append(select_capteur(id))
-    return l_capteurs
-
-
-#tri du tableau par dates croissantes
-def tri() :
-    tab_trie = [tableau[1]]
-    for ligne in tableau :
+#tri d'un tableau par valeurs de dates croissantes
+def tri(tab) :
+    tab_trie = [tab[1]]
+    for ligne in tab :
         i = 0
         while i<len(tab_trie) and ligne[7]>=tab_trie[i][7] :
             i = i+1
@@ -63,8 +43,27 @@ def tri() :
         else :
             tab_trie.insert(i, ligne)
     return tab_trie
+    
+tableau = tri(tableau)
 
-##sélection d'une durée entre deux dates pour un capteur donné
+##SELECTION DE DONNES
+#sélection du tableau associé à un capteur donné
+def select_capteur(id) :
+    capteur = []
+    for ligne in tableau :
+        if ligne[1] == id :
+            capteur.append(ligne)
+    return capteur
+
+
+#séparation des capteurs
+def capteurs() :
+    l_capteurs = []
+    for id in range(1, 7) :
+        l_capteurs.append(select_capteur(id))
+    return l_capteurs
+
+#sélection d'une durée entre deux dates pour un capteur donné
 def select_lignes(id, date1, date2) :
     '''Crée un nouveau tableau "periode" avec les lignes du tableau de base comprises entre les deux dates incluses '''
     if date1=="2019-08-11 11:30:50+02:00" and date2=="2019-08-25 17:47:08+02:00" :
@@ -78,7 +77,7 @@ def select_lignes(id, date1, date2) :
     
     
     
-##sélection d'une durée entre deux dates pour tous les capteurs
+#sélection d'une durée entre deux dates pour tous les capteurs
 def select_lignes_all(date1, date2) :
     '''Crée un nouveau tableau "periode" avec les lignes du tableau de base comprises entre les deux dates incluses '''
     if date1=="2019-08-11 11:30:50+02:00" and date2=="2019-08-25 17:47:08+02:00" :
@@ -186,32 +185,28 @@ def maximum_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
 
 
 ##AFFICHAGE DES COURBES
-##affichage de la courbe d'une variable
+##affichage de la courbe d'une variable pour un capteur
 def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables'''
     var = titres.index(nom_var)
     
     #RECUPERATION DE LA VARIABLE UTILE
-    periode = select_lignes(id, date1, date2)
+    periode = (select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
 
-    #Tiré de la fonction DisplayAll
-    #Permet de mettre des dates comme abscisse
+    #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    dates = [] 
     jours = [] 
-    for ligne in periode :
-        dates.append(ligne[-1])
-    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
-    for i in range(1,len(dates)) :
-        if not re.match(mem,dates[i]) :
-            jours.append(dates[i][:10])
-            mem = dates[i][:10]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
         else :
             jours.append("")
-
+            
     #AFFICHAGE DE LA COURBE
     plt.close()
     y = np.array(l_var)
@@ -225,7 +220,7 @@ def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     plt.show()
     
     
-    
+##affichage pour une variable tous capteurs confondus    (note : pas pertinent)
 def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables'''
@@ -234,18 +229,73 @@ def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     #RECUPERATION DE LA VARIABLE UTILE
     periode = select_lignes_all(date1, date2)
     l_var = [ligne[var] for ligne in periode]
-
+    
+    
+    #Permet de mettre des jours comme abscisse
+    #long à executer mais plus élégant
+    jours = [] 
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
+    mem = jours[0]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
+        else :
+            jours.append("")
+            
     #AFFICHAGE DE LA COURBE
     plt.close()
     y = np.array(l_var)
     x = np.array([i for i in range(len(l_var))])
 
     plt.plot(x, y, label=titres[var])
+    plt.xticks(range(len(jours)), jours, rotation=45)
     plt.ylabel(nom_var)
     plt.legend()
 
     plt.show()
     
+##affichage de toutes les courbes de chaque capteur en parallèle
+def display_capts(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    var = titres.index(nom_var)
+    periode = select_lignes_all(date1, date2)
+    capts = [[] for i in range(6)] #une liste par capteur
+    xcapts = [[] for i in range(6)] #une liste d'abcisses par capteur
+    kdate = 0 #servira pour les abcisses parce que sinon ça sera pas classé par ordre croissant
+    dates = [] #servira pour la légende des x
+    jours = [] #légende finale avec juste les jours
+
+    for ligne in periode :
+        dates.append(ligne[-1])
+        kdate = kdate+1
+        id = ligne[1]
+        for i in range(6) : #ajout de la valeur dans la liste du capteur correspondant
+            if i == id :
+                capts[i].append(ligne[var])
+                xcapts[i].append(kdate)
+
+    #Permet de mettre des jours comme abscisse
+    #long à executer mais plus élégant
+    jours = [] 
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
+    mem = jours[0]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
+        else :
+            jours.append("")
+
+    #affichage sous forme de graphique
+    plt.close()
+    for i in range(6) :
+        plt.plot(np.array(xcapts[i]), np.array(capts[i]),label="capteur "+str(i+1))
+    plt.xticks(range(len(jours)), jours, rotation=45)
+    plt.title(nom_var)
+    plt.legend()
+    plt.show()
+
+    return
 
     
 ##affichage des statistiques d'une variable
@@ -283,18 +333,15 @@ def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-
     y_max = np.array([maximum(nom_var, id, date1, date2)]*len(l_var))
     y_min = np.array([minimum(nom_var, id, date1, date2)]*len(l_var))
 
-    #Permet de mettre des dates en abscisse
+    #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    dates = [] 
     jours = [] 
-    for ligne in select_lignes(id,date1,date2) :
-        dates.append(ligne[-1])
-    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
-    for i in range(1,len(dates)) :
-        if not re.match(mem,dates[i]) :
-            jours.append(dates[i][:10])
-            mem = dates[i][:10]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
         else :
             jours.append("")
 
@@ -309,48 +356,6 @@ def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-
     plt.ylabel(nom_var)
     plt.legend(loc='center left',bbox_to_anchor=(1,0.5))
 
-    plt.show()
-
-    return
-
-
-#affichage de toutes les courbes
-def display_capts(nom_var) :
-    var = titres.index(nom_var)
-    tab_trie = tri()
-    capts = [[] for i in range(6)] #une liste par capteur
-    xcapts = [[] for i in range(6)] #une liste d'abcisses par capteur
-    kdate = 0 #servira pour les abcisses parce que sinon ça sera pas classé par ordre croissant
-    dates = [] #servira pour la légende des x
-    jours = [] #légende finale avec juste les jours
-
-    for ligne in tab_trie :
-        dates.append(ligne[-1])
-        kdate = kdate+1
-        id = ligne[1]
-        for i in range(6) : #ajout de la valeur dans la liste du capteur correspondant
-            if i == id :
-                capts[i].append(ligne[var])
-                xcapts[i].append(kdate)
-
-    #remplissage de la liste "jours" pour la légende
-    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
-    mem = jours[0]
-    for i in range(1,len(dates)) :
-        if not re.match(mem,dates[i]) :
-            
-            jours.append(dates[i][:10])
-            mem = dates[i][:10]
-        else :
-            jours.append("")
-
-    #affichage sous forme de graphique
-    plt.close()
-    for i in range(6) :
-        plt.plot(np.array(xcapts[i]), np.array(capts[i]),label="capteur "+str(i+1))
-    plt.xticks(range(len(jours)), jours, rotation=45)
-    plt.title(nom_var)
-    plt.legend()
     plt.show()
 
     return
@@ -378,18 +383,15 @@ def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02
         hum_moy = hum_moy+h
     hum_moy = hum_moy/len(l_hum)
     
-    #Permet de mettre des dates comme abscisse
+    #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    dates = [] 
     jours = [] 
-    for ligne in periode :
-        dates.append(ligne[-1])
-    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
-    for i in range(1,len(dates)) :
-        if not re.match(mem,dates[i]) :
-            jours.append(dates[i][:10])
-            mem = dates[i][:10]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
         else :
             jours.append("")
 
@@ -451,18 +453,15 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
     #calcul du coefficient de correlation
     r = round(cov/(sigma1*sigma2),2)
 
-    #Permet de mettre des dates en abscisse
+    #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    dates = [] 
     jours = [] 
-    for ligne in select_lignes(id,date1,date2) :
-        dates.append(ligne[-1])
-    jours.append(dates[0][:10]) #"AAAA-MM-JJ"
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
-    for i in range(1,len(dates)) :
-        if not re.match(mem,dates[i]) :
-            jours.append(dates[i][:10])
-            mem = dates[i][:10]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
         else :
             jours.append("")
             
@@ -489,7 +488,7 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
 
     return r
 
-## Je sais pas si c'est utile ?
+## Tous capteurs confondus
 def correlation_all(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
     utilise tableau, select_lignes, moyenne et ecart_type

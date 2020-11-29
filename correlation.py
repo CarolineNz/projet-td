@@ -56,12 +56,16 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
     #affichages avec deux ordonnées à échelles différentes :
     c1 = plt.plot(x, y1, color="blue")
     plt.legend(c1,[nom_var1], loc = 'upper left')
+    plt.xticks(range(len(jours)), jours, rotation=45)
     ax2 = plt.gca().twinx()
     
-    plt.xticks(range(len(jours)), jours, rotation=45)
+    
+    
     c2=ax2.plot(x, y2, color="orange") 
-    plt.legend(c2,[nom_var2])
+    plt.legend(c2,[nom_var2],loc='upper right')
+    #ax2.xticks(range(len(jours)), jours, rotation=45)
     plt.title("Coefficient de corrélation : "+str(r))
+    
     plt.show()
 
     return r

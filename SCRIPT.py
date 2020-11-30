@@ -17,7 +17,7 @@ def ouvrir_fichier() :
     '''Ouvre le fichier de données et le convertit en variables exploitables
     renvoie : (titres[liste de chaines], tableau[liste de listes de données]) '''
 
-    file = open("D:\Documents\GitHub\projet-td\EIVP_KM.csv") #à changer
+    file = open("EIVP_KM.csv")
     content = file.read()
     file.close()
 

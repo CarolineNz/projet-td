@@ -9,7 +9,7 @@ def ouvrir_fichier() :
     '''Ouvre le fichier de données et le convertit en variables exploitables
     renvoie : (titres[liste de chaines], tableau[liste de listes de données]) '''
 
-    file = open("D:\Documents\GitHub\projet-td\EIVP_KM.csv") #à changer
+    file = open("EIVP_KM.csv")
     content = file.read()
     file.close()
 
@@ -43,7 +43,7 @@ def tri(tab) :
         else :
             tab_trie.insert(i, ligne)
     return tab_trie
-    
+
 tableau = tri(tableau)
 
 ##SELECTION DE DONNES
@@ -51,7 +51,7 @@ tableau = tri(tableau)
 def select_capteur(id) :
     capteur = []
     for ligne in tableau :
-        if ligne[1] == id :
+        if int(ligne[1]) == int(id) :
             capteur.append(ligne)
     return capteur
 
@@ -74,9 +74,9 @@ def select_lignes(id, date1, date2) :
             if ligne[-1]>=date1 and ligne[-1]<=date2 :
                 periode.append(ligne)
         return periode
-    
-    
-    
+
+
+
 #sélection d'une durée entre deux dates pour tous les capteurs
 def select_lignes_all(date1, date2) :
     '''Crée un nouveau tableau "periode" avec les lignes du tableau de base comprises entre les deux dates incluses '''
@@ -93,7 +93,7 @@ def select_lignes_all(date1, date2) :
 
 ##FONCTIONS DE BASE
 ##stats pour une variable, un capteur, et sur une période de temps donnée
-def moyenne(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def moyenne(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
@@ -103,34 +103,34 @@ def moyenne(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     moy = moy/len(l_var)
     return moy
 
-def variance(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def variance(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
     vari = 0
-    moy = moyenne(nom_var, id, date1, date2)
+    moy = moyenne(id, nom_var, date1, date2)
     for e in l_var :
         vari = vari + pow(e-moy, 2)
     vari = vari/len(l_var)
     return vari
 
-def ecart_type(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
-    return math.sqrt(variance(nom_var, id, date1, date2))
+def ecart_type(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+    return math.sqrt(variance(id, nom_var, date1, date2))
 
-def mediane(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def mediane(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
     i = len(l_var)//2
     return l_var[i]
 
-def minimum(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def minimum(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
     return (min(l_var))
 
-def maximum(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def maximum(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
@@ -184,20 +184,20 @@ def maximum_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
 
 
 
-##AFFICHAGE DES COURBES
-##affichage de la courbe d'une variable pour un capteur
-def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+##affichage des courbes
+#affichage de la courbe d'une variable pour un capteur
+def display(id, nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables'''
     var = titres.index(nom_var)
-    
+
     #RECUPERATION DE LA VARIABLE UTILE
-    periode = (select_lignes(id, date1, date2)
+    periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
 
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -206,7 +206,7 @@ def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
             mem = periode[i][7][:10]
         else :
             jours.append("")
-            
+
     #AFFICHAGE DE LA COURBE
     plt.close()
     y = np.array(l_var)
@@ -218,22 +218,22 @@ def display(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     plt.legend()
 
     plt.show()
-    
-    
-##affichage pour une variable tous capteurs confondus    (note : pas pertinent)
+
+
+#affichage pour une variable tous capteurs confondus    (note : pas pertinent)
 def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables'''
     var = titres.index(nom_var)
-    
+
     #RECUPERATION DE LA VARIABLE UTILE
     periode = select_lignes_all(date1, date2)
     l_var = [ligne[var] for ligne in periode]
-    
-    
+
+
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -242,7 +242,7 @@ def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
             mem = periode[i][7][:10]
         else :
             jours.append("")
-            
+
     #AFFICHAGE DE LA COURBE
     plt.close()
     y = np.array(l_var)
@@ -254,8 +254,8 @@ def display_all(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17
     plt.legend()
 
     plt.show()
-    
-##affichage de toutes les courbes de chaque capteur en parallèle
+
+#affichage de toutes les courbes de chaque capteur en parallèle
 def display_capts(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     var = titres.index(nom_var)
     periode = select_lignes_all(date1, date2)
@@ -276,7 +276,7 @@ def display_capts(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 
 
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -297,29 +297,29 @@ def display_capts(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 
 
     return
 
-    
+
 ##affichage des statistiques d'une variable
-def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def display_stat(id,nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''Utilise tableau, select_lignes
     affiche la courbe d'une des variables avec ses statistiques'''
     var = titres.index(nom_var)
-    
+
     #RECUPERATION DE LA VARIABLE UTILE
     periode = select_lignes(id, date1, date2)
     l_var = [ligne[var] for ligne in periode]
 
     #CALCUL DES STATISTIQUES + CONVERSION EN CHAINES
     #calcul de la moyenne
-    moy = "moyenne : " + str(round(moyenne(nom_var, id, date1, date2),2))
+    moy = "moyenne : " + str(round(moyenne(id, nom_var, date1, date2),2))
     #calcul de l'écart-type
-    sigma = "ecart_type :" + str(round(ecart_type(nom_var, id, date1, date2),2))
+    sigma = "ecart_type :" + str(round(ecart_type(id, nom_var, date1, date2),2))
     #calcul de la variance
-    vari = "variance :" + str(round(variance(nom_var, id, date1, date2),2))
+    vari = "variance :" + str(round(variance(id, nom_var, date1, date2),2))
     #calcul de la mediane
-    med = "mediane :" + str(mediane(nom_var, id, date1, date2))
+    med = "mediane :" + str(mediane(id, nom_var, date1, date2))
     #calcul du minimum et du maximum
-    mini = "minimum :" + str(minimum(nom_var, id, date1, date2))
-    maxi = "maximum :" + str(maximum(nom_var, id, date1, date2))
+    mini = "minimum :" + str(minimum(id, nom_var, date1, date2))
+    maxi = "maximum :" + str(maximum(id, nom_var, date1, date2))
 
     statistiques = "\n" + sigma + "\n" + vari
 
@@ -327,15 +327,15 @@ def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-
     plt.close()
     y = np.array(l_var)
     x = np.array([i for i in range(len(l_var))])
-    
-    y_moy = np.array([moyenne(nom_var, id, date1, date2)]*len(l_var))
-    y_med = np.array([mediane(nom_var, id, date1, date2)]*len(l_var))
-    y_max = np.array([maximum(nom_var, id, date1, date2)]*len(l_var))
-    y_min = np.array([minimum(nom_var, id, date1, date2)]*len(l_var))
+
+    y_moy = np.array([moyenne(id, nom_var, date1, date2)]*len(l_var))
+    y_med = np.array([mediane(id, nom_var, date1, date2)]*len(l_var))
+    y_max = np.array([maximum(id, nom_var, date1, date2)]*len(l_var))
+    y_min = np.array([minimum(id, nom_var, date1, date2)]*len(l_var))
 
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -350,8 +350,8 @@ def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-
     plt.plot(x, y, label=nom_var)
     plt.plot(x,y_moy,label = moy)
     plt.plot(x,y_med,label = med)
-    plt.plot(x,y_max,label = mini)
-    plt.plot(x,y_min,label = maxi)
+    plt.plot(x,y_max,label = maxi)
+    plt.plot(x,y_min,label = mini)
     plt.xticks(range(len(jours)), jours, rotation=45)
     plt.ylabel(nom_var)
     plt.legend(loc='center left',bbox_to_anchor=(1,0.5))
@@ -362,7 +362,7 @@ def display_stat(nom_var, id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-
 
 
 ##INDICE HUMIDEX
-##pour un capteur donné
+#pour un capteur donné
 def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''utilise tableau, select_lignes
     affiche la courbe de l'humidex sur la période donnée
@@ -377,15 +377,15 @@ def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02
         l_hum.append(T + 5/9*(6.112*pow(10, 7.5*T/(237.7+T))*H/100-10))
 
     #moyenne sur la période donnée
-    
+
     hum_moy = 0
     for h in l_hum :
         hum_moy = hum_moy+h
     hum_moy = hum_moy/len(l_hum)
-    
+
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -409,6 +409,7 @@ def humidex(id, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02
 
     return hum_moy
 
+#Pour tous les capteurs :
 def humidex_all():
     resultat=0
     for i in range(1,7):
@@ -440,22 +441,22 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
     moyp = moyp/len(periode)
 
     #calcul des deux autres espérences
-    moy1 = moyenne(nom_var1, id, date1, date2)
-    moy2 = moyenne(nom_var2, id, date1, date2)
+    moy1 = moyenne(id, nom_var1, date1, date2)
+    moy2 = moyenne(id, nom_var2, date1, date2)
 
     #calcul de la covariance
     cov = moyp - moy1*moy2
 
     #calcul des écart-types
-    sigma1 = ecart_type(nom_var1, id, date1, date2)
-    sigma2 = ecart_type(nom_var2, id, date1, date2)
+    sigma1 = ecart_type(id, nom_var1, date1, date2)
+    sigma2 = ecart_type(id, nom_var2, date1, date2)
 
     #calcul du coefficient de correlation
     r = round(cov/(sigma1*sigma2),2)
 
     #Permet de mettre des jours comme abscisse
     #long à executer mais plus élégant
-    jours = [] 
+    jours = []
     jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
     mem = jours[0]
     for i in range(len(periode)) :
@@ -464,7 +465,7 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
             mem = periode[i][7][:10]
         else :
             jours.append("")
-            
+
     #AFFICHAGE DES DEUX COURBES
     plt.close()
     y1 = np.array(l_var1)
@@ -476,19 +477,19 @@ def correlation(id, nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
     plt.legend(c1,[nom_var1], loc = 'upper left')
     plt.xticks(range(len(jours)), jours, rotation=45)
     ax2 = plt.gca().twinx()
-    
-    
-    
-    c2=ax2.plot(x, y2, color="orange") 
+
+
+
+    c2=ax2.plot(x, y2, color="orange")
     plt.legend(c2,[nom_var2],loc='upper right')
     #ax2.xticks(range(len(jours)), jours, rotation=45)
     plt.title("Coefficient de corrélation : "+str(r))
-    
+
     plt.show()
 
     return r
 
-## Tous capteurs confondus
+
 def correlation_all(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     '''var1 et var2 les INDICES des variables (numéro de colonne)
     utilise tableau, select_lignes, moyenne et ecart_type
@@ -522,18 +523,52 @@ def correlation_all(nom_var1, nom_var2, date1="2019-08-11 11:30:50+02:00", date2
 
     #calcul du coefficient de correlation
     r = cov/(sigma1*sigma2)
+
+    #AFFICHAGE DES DEUX COURBES
+    plt.close()
+    y1 = np.array(l_var1)
+    y2 = np.array(l_var2)
+    x = np.array([i for i in range(len(l_var1))]) #car les mesures sont prises à intervalles réguliers
+
+    #Permet de mettre des jours comme abscisse
+    #long à executer mais plus élégant
+    jours = []
+    jours.append(periode[0][7][:10]) #"AAAA-MM-JJ"
+    mem = jours[0]
+    for i in range(len(periode)) :
+        if not re.match(mem,periode[i][7]) :
+            jours.append(periode[i][7][:10])
+            mem = periode[i][7][:10]
+        else :
+            jours.append("")
+
+    #affichages avec deux ordonnées à échelles différentes :
+    c1 = plt.plot(x, y1, color="blue")
+    plt.legend(c1,[nom_var1], loc = 'upper left')
+    plt.xticks(range(len(jours)), jours, rotation=45)
+    ax2 = plt.gca().twinx()
+
+
+
+    c2=ax2.plot(x, y2, color="orange")
+    plt.legend(c2,[nom_var2],loc='upper right')
+    #ax2.xticks(range(len(jours)), jours, rotation=45)
+    plt.title("Coefficient de corrélation : "+str(r))
+
+    plt.show()
+
     return r
 
 
 
 
-##Position des capteurs
+##PROBLEME OUVERT : POSITION DES CAPTEURS
 #comparaison : au dessus/en dessous de la moyenne pour chaque capteur
 def analyse_moy(nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00"):
     sup=[]
     inf=[]
     for i in range(1,6):
-        if moyenne(nom_var,i,date1,date2)>=moyenne_all(nom_var,date1,date2):
+        if moyenne(i,nom_var,date1,date2)>=moyenne_all(nom_var,date1,date2):
             sup.append(i)
         else :
             inf.append(i)
@@ -549,7 +584,7 @@ def analyse_moy_all():
 
     return
 
-def analyse_positions(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
+def analyse_position(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:08+02:00") :
     #calcul des moyennes de chaque valeur :
     moy_co2 = moyenne_all("co2")
     moy_lum = moyenne_all("lum")
@@ -557,11 +592,11 @@ def analyse_positions(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47
     ecarts_lum = []
     for id in range(1,7) :
         #calcul des moyennes pour le capteur :
-        moy_capt_co2 = moyenne("co2",id,date1,date2)
-        moy_capt_lum = moyenne("lum",id,date1,date2)
+        moy_capt_co2 = moyenne(id,"co2",date1,date2)
+        moy_capt_lum = moyenne(id,"lum",date1,date2)
         #calcul des écarts aux moyennes pour ce capteur :
-        ecarts_co2.append(moy_co2-moy_capt_co2)
-        ecarts_lum.append(moy_lum-moy_capt_lum)
+        ecarts_co2.append(moy_capt_co2-moy_co2)
+        ecarts_lum.append(moy_capt_lum-moy_lum)
 
     #affichage :
     plt.clf()

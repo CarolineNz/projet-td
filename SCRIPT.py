@@ -12,6 +12,8 @@ import math
 import re
 
 
+print("Chargement en cours. \nCertaines actions prennent plus de temps à charger lorsque l'affichage des courbes est plus complexe.")
+
 ##OUVERTURE DU FICHIER
 def ouvrir_fichier() :
     '''Ouvre le fichier de données et le convertit en variables exploitables
@@ -358,8 +360,8 @@ def display_stat(id,nom_var, date1="2019-08-11 11:30:50+02:00", date2="2019-08-2
     plt.plot(x, y, label=nom_var)
     plt.plot(x,y_moy,label = moy)
     plt.plot(x,y_med,label = med)
-    plt.plot(x,y_max,label = mini)
-    plt.plot(x,y_min,label = maxi)
+    plt.plot(x,y_max,label = maxi)
+    plt.plot(x,y_min,label = mini)
     plt.xticks(range(len(jours)), jours, rotation=45)
     plt.ylabel(nom_var)
     plt.legend(loc='center left',bbox_to_anchor=(1,0.5))
@@ -603,8 +605,8 @@ def analyse_position(date1="2019-08-11 11:30:50+02:00", date2="2019-08-25 17:47:
         moy_capt_co2 = moyenne(id,"co2",date1,date2)
         moy_capt_lum = moyenne(id,"lum",date1,date2)
         #calcul des écarts aux moyennes pour ce capteur :
-        ecarts_co2.append(moy_co2-moy_capt_co2)
-        ecarts_lum.append(moy_lum-moy_capt_lum)
+        ecarts_co2.append(moy_capt_co2-moy_co2)
+        ecarts_lum.append(moy_capt_lum-moy_lum)
 
     #affichage :
     plt.clf()
@@ -655,10 +657,10 @@ if action == "display" :
 
 
     elif sys.argv[2] == "capteurs" :
-        if len(sys.argv) == 5 : #les dates sont précisées
-            display_capts(sys.argv[3], sys.argv[4])
+        if len(sys.argv) == 6 : #les dates sont précisées
+            display_capts(sys.argv[3], sys.argv[4], sys.argv[5])
         else :
-            display_capts()
+            display_capts(sys.argv[3])
 
     else :
         if sys.argv[2].isdigit(): #id capteur donné
